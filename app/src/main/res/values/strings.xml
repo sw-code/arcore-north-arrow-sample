@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">ARCore-North-Arrow</string>
+    <string name="opengl_required_title">OpenGL Error</string>
+    <string name="opengl_required_message">OpenGL ES %1$s or later required</string>
+</resources>
