@@ -114,9 +114,10 @@ abstract class BaseArCoreFragment : Fragment(),
                         .let { observableEmitter.onNext(it) }
 
                     observableEmitter.setCancellable {
+                        renderableNodeFactory.destroy()
+                        frameCallback.stop()
                         modelsRenderer.destroy()
                         filamentContext.destroy()
-                        renderableNodeFactory.destroy()
                     }
                 }
                     .subscribeOn(AndroidSchedulers.mainThread())

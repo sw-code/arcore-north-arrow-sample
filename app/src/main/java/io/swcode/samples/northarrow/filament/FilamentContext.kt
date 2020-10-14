@@ -101,4 +101,11 @@ class FilamentContext(context: Context, arCore: ArCore, val textureView: Texture
         scene.addEntities(filamentAsset.entities)
         engine.transformManager.setTransform(engine.transformManager.getInstance(filamentAsset.root), floatArray)
     }
+
+    fun cleanUp(assets: List<FilamentAsset>) {
+        assets.forEach {
+            scene.removeEntities(it.entities)
+            engine.transformManager.destroy(engine.transformManager.getInstance(it.root))
+        }
+    }
 }

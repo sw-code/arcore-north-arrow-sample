@@ -1,7 +1,5 @@
 package io.swcode.samples.northarrow.math;
 
-import android.util.Log;
-
 import com.google.ar.core.Pose;
 
 /** Static functions for common math operations. */

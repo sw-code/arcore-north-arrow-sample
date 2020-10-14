@@ -10,7 +10,6 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.PublishSubject
-import io.swcode.samples.northarrow.arcore.ArCore
 import io.swcode.samples.northarrow.filament.FilamentContext
 import io.swcode.samples.northarrow.math.*
 import io.swcode.samples.northarrow.renderer.node.RenderableNode
@@ -82,7 +81,7 @@ class ModelRenderer(
     }
 
     fun destroy() {
-        compositeDisposable.dispose()
+        compositeDisposable.clear()
     }
 
     fun doFrame(frame: Frame) {

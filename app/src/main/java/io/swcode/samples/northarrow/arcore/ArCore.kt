@@ -1,9 +1,10 @@
 package io.swcode.samples.northarrow.arcore
 
 import android.annotation.SuppressLint
-import io.reactivex.rxjava3.core.Observable
 import android.app.Activity
-import android.hardware.camera2.*
+import android.hardware.camera2.CameraCharacteristics
+import android.hardware.camera2.CameraDevice
+import android.hardware.camera2.CameraManager
 import android.opengl.EGLContext
 import android.opengl.Matrix
 import android.os.Build
@@ -15,7 +16,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.updateLayoutParams
 import arrow.core.orNull
 import com.google.android.filament.*
-import com.google.ar.core.*
+import com.google.ar.core.Config
+import com.google.ar.core.Frame
+import com.google.ar.core.Session
+import io.reactivex.rxjava3.core.Observable
 import io.spotar.tour.filament.sample.renderer.createEglContext
 import io.spotar.tour.filament.sample.renderer.createExternalTextureId
 import io.spotar.tour.filament.sample.renderer.destroyEglContext

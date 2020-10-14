@@ -7,7 +7,6 @@ import androidx.annotation.DrawableRes
 import com.google.android.filament.Engine
 import com.google.android.filament.Texture
 import com.google.android.filament.android.TextureHelper
-import java.lang.IllegalArgumentException
 
 enum class TextureType {
     Color,

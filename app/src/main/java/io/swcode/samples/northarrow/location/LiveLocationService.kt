@@ -6,9 +6,6 @@ import android.location.Criteria
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
-import android.util.Log
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.swcode.samples.northarrow.eventbus.SimpleEventBus
 
 class LiveLocationService constructor(context: Context) : LocationListener {

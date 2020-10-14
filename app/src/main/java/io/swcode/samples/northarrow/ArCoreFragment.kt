@@ -9,10 +9,10 @@ import androidx.core.view.isVisible
 import io.swcode.samples.northarrow.arcore.BaseArCoreFragment
 import io.swcode.samples.northarrow.event.TrackingStateEvent
 import io.swcode.samples.northarrow.eventbus.SimpleEventBus
-import io.swcode.samples.northarrow.renderer.renderable.Arrow
 import io.swcode.samples.northarrow.renderer.position.AirPositioning
 import io.swcode.samples.northarrow.renderer.position.NorthPositioningPose
 import io.swcode.samples.northarrow.renderer.position.TouchPositioning
+import io.swcode.samples.northarrow.renderer.renderable.Arrow
 import io.swcode.samples.northarrow.renderer.renderable.Dancer
 import kotlinx.android.synthetic.main.fragment_arcore.*
 
@@ -28,6 +28,10 @@ class ArCoreFragment : BaseArCoreFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        closeButton.setOnClickListener {
+            requireActivity().onBackPressed()
+        }
 
         addBehindCameraButton.setOnClickListener {
             SimpleEventBus.publish(Arrow(AirPositioning()))

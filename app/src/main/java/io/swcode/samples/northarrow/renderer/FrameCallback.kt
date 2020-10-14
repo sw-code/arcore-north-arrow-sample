@@ -1,5 +1,6 @@
 package io.swcode.samples.northarrow.renderer
 
+import android.util.Log
 import android.view.Choreographer
 import com.google.ar.core.Frame
 import io.swcode.samples.northarrow.arcore.ArCore
@@ -26,6 +27,7 @@ class FrameCallback(
     private var frameRate: FrameRate = FrameRate.Full
 
     override fun doFrame(frameTimeNanos: Long) {
+        Log.i("FrameCallback", "doFrame")
         choreographer.postFrameCallback(this)
 
         // limit to max fps
