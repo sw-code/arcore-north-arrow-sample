@@ -2,11 +2,7 @@ package io.swcode.samples.northarrow.arcore
 
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.google.ar.core.Plane
@@ -22,18 +18,17 @@ import io.spotar.tour.filament.sample.event.ResumeEvents
 import io.spotar.tour.filament.sample.event.exception.UserCanceledException
 import io.spotar.tour.filament.sample.orientation.Orientation
 import io.swcode.samples.northarrow.R
+import io.swcode.samples.northarrow.event.TrackingStateEvent
 import io.swcode.samples.northarrow.eventbus.SimpleEventBus
 import io.swcode.samples.northarrow.filament.FilamentContext
 import io.swcode.samples.northarrow.location.LiveLocationService
 import io.swcode.samples.northarrow.orientation.OrientationService
 import io.swcode.samples.northarrow.renderer.*
-import io.swcode.samples.northarrow.renderer.position.AirPositioning
-import io.swcode.samples.northarrow.renderer.position.NorthPositioningPose
-import io.swcode.samples.northarrow.renderer.position.TouchPositioning
+import io.swcode.samples.northarrow.renderer.node.RenderableNodeFactory
 import kotlinx.android.synthetic.main.fragment_arcore.*
 import java.util.concurrent.TimeUnit
 
-class BaseArCoreFragment : Fragment(),
+abstract class BaseArCoreFragment : Fragment(),
     ConfigurationChangedEvents, ResumeEvents, ResumeBehavior, AutoHideSystemUi {
 
     override val onSystemUiFlagHideNavigationDisposable: CompositeDisposable =
@@ -51,6 +46,8 @@ class BaseArCoreFragment : Fragment(),
     private val arTrackingEvents: PublishSubject<Unit> =
         PublishSubject.create()
 
+    protected val trackingStateEvents: PublishSubject<TrackingStateEvent> = PublishSubject.create()
+
     private val arContextSignal: BehaviorSubject<ArContext> =
         BehaviorSubject.create()
 
@@ -59,21 +56,13 @@ class BaseArCoreFragment : Fragment(),
 
     private val onStartDisposable: CompositeDisposable = CompositeDisposable()
 
-    private val onResumeDisposable: CompositeDisposable = CompositeDisposable()
+    protected val onResumeDisposable: CompositeDisposable = CompositeDisposable()
 
     private lateinit var orientationService: OrientationService
 
     private lateinit var locationService: LiveLocationService
 
     private lateinit var arSensorService: ArSensorService
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_arcore, container, false)
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -86,17 +75,17 @@ class BaseArCoreFragment : Fragment(),
             .flatMapObservable { ArCore.arCoreSignal(requireActivity(), textureView) }
             .flatMap { arCore ->
                 Observable.create<ArContext> { observableEmitter ->
-                    val filamentService = FilamentContext(requireContext(), arCore, textureView)
+                    val filamentContext = FilamentContext(requireContext(), arCore, textureView)
 
-                    val cameraRenderer = CameraRenderer(filamentService, arCore)
-                    val lightRenderer = LightRenderer(filamentService)
-                    val planeRenderer = PlaneRenderer(requireContext(), filamentService)
-                    val modelsRenderer = ModelsRenderer(requireContext(), arCore, filamentService)
+                    val cameraRenderer = CameraRenderer(filamentContext, arCore)
+                    val lightRenderer = LightRenderer(filamentContext)
+                    val planeRenderer = PlaneRenderer(requireContext(), filamentContext)
+                    val modelsRenderer = ModelsRenderer(requireContext(), filamentContext)
                     val renderableNodeFactory = RenderableNodeFactory()
 
                     val frameCallback = FrameCallback(
                         arCore,
-                        filamentService,
+                        filamentContext,
                         doFrame = { frame ->
                             arSensorService.onUpdate(frame)
                             if (frame.getUpdatedTrackables(Plane::class.java)
@@ -115,7 +104,7 @@ class BaseArCoreFragment : Fragment(),
 
                     ArContext(
                         arCore,
-                        filamentService,
+                        filamentContext,
                         cameraRenderer,
                         lightRenderer,
                         planeRenderer,
@@ -126,7 +115,8 @@ class BaseArCoreFragment : Fragment(),
 
                     observableEmitter.setCancellable {
                         modelsRenderer.destroy()
-                        filamentService.destroy()
+                        filamentContext.destroy()
+                        renderableNodeFactory.destroy()
                     }
                 }
                     .subscribeOn(AndroidSchedulers.mainThread())
@@ -148,24 +138,6 @@ class BaseArCoreFragment : Fragment(),
         arSensorService = ArSensorService(requireContext())
         locationService = LiveLocationService(requireContext())
         orientationService = OrientationService(requireContext())
-
-        addBehindCameraButton.setOnClickListener {
-            SimpleEventBus.publish(Arrow(AirPositioning()))
-        }
-
-        addCompassButton.setOnClickListener {
-            SimpleEventBus.publish(Arrow(NorthPositioningPose()))
-        }
-
-        textureView.setOnTouchListener { _, motionEvent ->
-            if (motionEvent.action == MotionEvent.ACTION_UP &&
-                (motionEvent.eventTime - motionEvent.downTime) <
-                resources.getInteger(R.integer.tap_event_milliseconds)
-            ) {
-                SimpleEventBus.publish(Arrow(TouchPositioning(motionEvent)))
-            }
-            true
-        }
     }
 
     override fun onDestroyView() {
@@ -191,33 +163,7 @@ class BaseArCoreFragment : Fragment(),
             .subscribe({}, { errorHandler(it) })
             .let { onStartDisposable.add(it) }
 
-        arContextSignal
-            .flatMap {
-                Observable
-                    .amb(listOf(
-                        Observable
-                            .concat(
-                                Observable
-                                    .just(true)
-                                    .delay(
-                                        resources
-                                            .getInteger(R.integer.show_hand_motion_timeout_seconds)
-                                            .toLong(),
-                                        TimeUnit.SECONDS
-                                    ),
-                                arTrackingEvents
-                                    .take(1)
-                                    .map { false }
-                            ),
-                        arTrackingEvents
-                            .take(1)
-                            .map { false }
-                    ))
-            }
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnDispose { handMotionContainer.isVisible = false }
-            .subscribe({ handMotionContainer.isVisible = it }, { errorHandler(it) })
-            .let { onStartDisposable.add(it) }
+        setupTrackingState()
     }
 
     override fun onStop() {
@@ -241,14 +187,6 @@ class BaseArCoreFragment : Fragment(),
             .let {
                 onResumeDisposable.add(it)
             }
-
-        Observable.combineLatest(arTrackingEvents, arContextSignal, {
-                _, contextSignal ->
-            Log.i("ArCoreFragment", "onResume")
-            addBehindCameraButton.visibility = View.VISIBLE
-
-        }).take(1)
-            .subscribe()
     }
 
     private fun updateDebugView(orientation: Orientation) {
@@ -268,8 +206,47 @@ class BaseArCoreFragment : Fragment(),
         configurationChangedEvents.onNext(newConfig)
     }
 
+
+    private fun setupTrackingState() {
+        // TrackingState event is fired as soon as the first arTracking event arrives (TrackingState.tracking=true)
+        // or if there is no arTracking event for 2 seconds (TrackingState.tracking=false)
+        arContextSignal
+            .flatMap {
+                Observable
+                    .amb(listOf(
+                        Observable
+                            .concat(
+                                Observable
+                                    .just(false)
+                                    .delay(
+                                        resources
+                                            .getInteger(R.integer.show_hand_motion_timeout_seconds)
+                                            .toLong(),
+                                        TimeUnit.SECONDS
+                                    ),
+                                arTrackingEvents
+                                    .take(1)
+                                    .map { true }
+                            ),
+                        arTrackingEvents
+                            .take(1)
+                            .map { true }
+                    ))
+            }
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnDispose {
+                trackingStateEvents.onNext(TrackingStateEvent(false))
+            }
+            .subscribe { trackingStateEvents.onNext(TrackingStateEvent(it)) }
+            .let { onStartDisposable.add(it) }
+
+        trackingStateEvents.subscribe {
+            handMotionContainer.isVisible = !it.tracking
+        }.let { onStartDisposable.add(it) }
+    }
+
     private fun errorHandler(error: Throwable) {
-        if(isAdded) {
+        if (isAdded) {
             requireActivity().finish()
         }
         if (error is UserCanceledException) {

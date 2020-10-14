@@ -1,4 +1,4 @@
-package io.swcode.samples.northarrow.renderer
+package io.swcode.samples.northarrow.renderer.node
 
 import com.google.ar.core.Frame
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -8,6 +8,7 @@ import io.swcode.samples.northarrow.eventbus.SimpleEventBus
 import io.swcode.samples.northarrow.renderer.position.AirPositioning
 import io.swcode.samples.northarrow.renderer.position.NorthPositioningPose
 import io.swcode.samples.northarrow.renderer.position.TouchPositioning
+import io.swcode.samples.northarrow.renderer.renderable.Renderable
 
 class RenderableNodeFactory {
     private val doFrameEvent: PublishSubject<Frame> = PublishSubject.create()

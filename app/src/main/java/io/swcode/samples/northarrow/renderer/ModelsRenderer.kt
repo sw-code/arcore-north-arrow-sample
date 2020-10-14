@@ -6,9 +6,9 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.swcode.samples.northarrow.arcore.ArCore
 import io.swcode.samples.northarrow.eventbus.SimpleEventBus
 import io.swcode.samples.northarrow.filament.FilamentContext
+import io.swcode.samples.northarrow.renderer.node.RenderableNode
 
 class ModelsRenderer(private val context: Context,
-                     private val arCore: ArCore,
                      private val filamentContext: FilamentContext) {
 
     private val renderer: MutableList<ModelRenderer> = arrayListOf()
@@ -18,7 +18,7 @@ class ModelsRenderer(private val context: Context,
     init {
         SimpleEventBus.listen(RenderableNode::class.java)
             .subscribe {
-                renderer.add(ModelRenderer(context, arCore, filamentContext, it))
+                renderer.add(ModelRenderer(context, filamentContext, it))
             }
             .let { compositeDisposable.clear() }
     }

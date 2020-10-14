@@ -5,7 +5,6 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import io.spotar.tour.filament.sample.orientation.Orientation
 import io.swcode.samples.northarrow.eventbus.SimpleEventBus
@@ -60,7 +59,6 @@ class OrientationService constructor(private val context: Context) : SensorEvent
                     val y = radianToDegree(filteredVector!![1].toDouble()).toInt()
                     val z = ((radianToDegree(filteredVector!![2].toDouble()) + 360) % 360).toInt()
 
-                    Log.i("OrientationService", "onSensorChanged: " + Orientation( x, y, z))
                     SimpleEventBus.publish(Orientation( x, y, z))
                 }
             }

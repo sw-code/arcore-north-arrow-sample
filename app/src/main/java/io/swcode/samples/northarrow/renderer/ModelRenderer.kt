@@ -13,12 +13,12 @@ import io.reactivex.rxjava3.subjects.PublishSubject
 import io.swcode.samples.northarrow.arcore.ArCore
 import io.swcode.samples.northarrow.filament.FilamentContext
 import io.swcode.samples.northarrow.math.*
+import io.swcode.samples.northarrow.renderer.node.RenderableNode
 import java.nio.ByteBuffer
 import java.util.concurrent.TimeUnit
 
 class ModelRenderer(
     context: Context,
-    private val arCore: ArCore,
     private val filamentContext: FilamentContext,
     private val renderableNode: RenderableNode
 ) {
@@ -33,7 +33,7 @@ class ModelRenderer(
             .create<FilamentAsset> { singleEmitter ->
                 Log.i("ModelRenderer", "Load file")
                 context.assets
-                    .open("st_naviArrow.glb")
+                    .open(renderableNode.renderable.assetFileName)
                     .use { input ->
                         val bytes = ByteArray(input.available())
                         input.read(bytes)

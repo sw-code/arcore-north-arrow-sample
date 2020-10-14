@@ -56,8 +56,6 @@ public class MathHelper {
   }
 
   public static Pose axisRotation(int axis, float angleRad) {
-    Log.i("MathHelper: ", MathUtilKt.radianToDegree(angleRad) + "");
-
     float sinHalf = (float)Math.sin(angleRad/2);
     float cosHalf = (float)Math.cos(angleRad/2);
 

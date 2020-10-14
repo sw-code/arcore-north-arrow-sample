@@ -22,7 +22,7 @@ class MainActivity : AppCompatActivity() {
             .request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.CAMERA)
             .subscribe { granted ->
                 if (granted) {
-                    val fragment = BaseArCoreFragment()
+                    val fragment = ArCoreFragment()
                     val transaction = supportFragmentManager.beginTransaction()
                     transaction.add(R.id.fragmentContainer, fragment, "arCore")
                     transaction.commit()
