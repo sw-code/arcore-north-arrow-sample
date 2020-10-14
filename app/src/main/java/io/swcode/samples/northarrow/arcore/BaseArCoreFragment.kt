@@ -33,8 +33,11 @@ import io.swcode.samples.northarrow.renderer.position.TouchPositioning
 import kotlinx.android.synthetic.main.fragment_arcore.*
 import java.util.concurrent.TimeUnit
 
-class ArCoreFragment : Fragment(),
-    ConfigurationChangedEvents, ResumeEvents, ResumeBehavior {
+class BaseArCoreFragment : Fragment(),
+    ConfigurationChangedEvents, ResumeEvents, ResumeBehavior, AutoHideSystemUi {
+
+    override val onSystemUiFlagHideNavigationDisposable: CompositeDisposable =
+        CompositeDisposable()
 
     override val resumeBehavior: BehaviorSubject<Boolean> =
         BehaviorSubject.create()
@@ -74,6 +77,8 @@ class ArCoreFragment : Fragment(),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        onCreateAutoHideSystemUi(requireActivity())
+
         resumeBehavior
             .filter { it }
             .firstOrError()
@@ -217,7 +222,7 @@ class ArCoreFragment : Fragment(),
 
     override fun onStop() {
         super.onStop()
-//        onSystemUiFlagHideNavigationDisposable.clear()
+        onSystemUiFlagHideNavigationDisposable.clear()
         onStartDisposable.clear()
     }
 
@@ -225,7 +230,8 @@ class ArCoreFragment : Fragment(),
         super.onResume()
         orientationService.onResume()
         arSensorService.onResume()
-//        onResumeAutoHideSystemUi()
+
+        onResumeAutoHideSystemUi(requireActivity())
         resumeEvents.onNext(Unit)
         resumeBehavior.onNext(true)
 

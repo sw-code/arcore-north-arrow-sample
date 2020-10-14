@@ -2,4 +2,5 @@
 <resources>
     <integer name="show_hand_motion_timeout_seconds">2</integer>
     <integer name="tap_event_milliseconds">200</integer>
+    <integer name="hide_system_navigation_timeout_seconds">1</integer>
 </resources>

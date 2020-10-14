@@ -3,12 +3,10 @@ package io.swcode.samples.northarrow
 import android.Manifest
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.tbruyelle.rxpermissions3.RxPermissions
-import io.reactivex.rxjava3.core.Observable
-import io.swcode.samples.northarrow.arcore.ArCoreFragment
+import io.swcode.samples.northarrow.arcore.BaseArCoreFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -24,7 +22,7 @@ class MainActivity : AppCompatActivity() {
             .request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.CAMERA)
             .subscribe { granted ->
                 if (granted) {
-                    val fragment = ArCoreFragment()
+                    val fragment = BaseArCoreFragment()
                     val transaction = supportFragmentManager.beginTransaction()
                     transaction.add(R.id.fragmentContainer, fragment, "arCore")
                     transaction.commit()
