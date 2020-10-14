@@ -27,7 +27,8 @@ import io.swcode.samples.northarrow.filament.FilamentContext
 import io.swcode.samples.northarrow.location.LiveLocationService
 import io.swcode.samples.northarrow.orientation.OrientationService
 import io.swcode.samples.northarrow.renderer.*
-import io.swcode.samples.northarrow.renderer.position.CameraPositioning
+import io.swcode.samples.northarrow.renderer.position.AirPositioning
+import io.swcode.samples.northarrow.renderer.position.NorthPositioningPose
 import io.swcode.samples.northarrow.renderer.position.TouchPositioning
 import kotlinx.android.synthetic.main.fragment_arcore.*
 import java.util.concurrent.TimeUnit
@@ -144,9 +145,12 @@ class ArCoreFragment : Fragment(),
         orientationService = OrientationService(requireContext())
 
         addBehindCameraButton.setOnClickListener {
-            SimpleEventBus.publish(Arrow(CameraPositioning()))
+            SimpleEventBus.publish(Arrow(AirPositioning()))
         }
 
+        addCompassButton.setOnClickListener {
+            SimpleEventBus.publish(Arrow(NorthPositioningPose()))
+        }
 
         textureView.setOnTouchListener { _, motionEvent ->
             if (motionEvent.action == MotionEvent.ACTION_UP &&

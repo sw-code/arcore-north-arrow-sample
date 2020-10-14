@@ -54,11 +54,10 @@
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <Button
-        android:id="@+id/addOnPlaneButton"
+        android:id="@+id/addCompassButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:text="Add on plane"
+        android:text="Add compass"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 

@@ -12,9 +12,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.PublishSubject
 import io.swcode.samples.northarrow.arcore.ArCore
 import io.swcode.samples.northarrow.filament.FilamentContext
-import io.swcode.samples.northarrow.math.m4Identity
-import io.swcode.samples.northarrow.math.scale
-import io.swcode.samples.northarrow.math.translate
+import io.swcode.samples.northarrow.math.*
 import java.nio.ByteBuffer
 import java.util.concurrent.TimeUnit
 
@@ -27,8 +25,6 @@ class ModelRenderer(
 
     private val doFrameEvent: PublishSubject<Frame> = PublishSubject.create()
     private val compositeDisposable = CompositeDisposable()
-
-    private var scaling: Float = 0.04f
 
     init {
         // update filament
@@ -70,14 +66,13 @@ class ModelRenderer(
                     },
                     Observable.create {
                         val pose = renderableNode.pose
-//                        val pose = arCore.frame.camera.pose
-//                            .compose(Pose.makeTranslation(0.1f, 0.0f, -2f))
-//                            .extractTranslation()
+
+                        val scaleVector = Vector3(renderableNode.renderable.scaling, renderableNode.renderable.scaling, renderableNode.renderable.scaling)
 
                         val localTransform = m4Identity()
-                            .translate(pose.tx(), pose.ty(), pose.tz())
-                            .scale(scaling, scaling, scaling)
+                            .makeTrs(pose.translationToVector3(), pose.rotationToQuaternion(), scaleVector)
                             .floatArray
+
                         filamentContext.applyOnFrame(filamentAsset, localTransform)
                     }
                 )
